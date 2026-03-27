@@ -1,6 +1,13 @@
-const {mongoose,Schema,model} = require( 'mongoose')
-const { string } = require('zod');
-mongoose.connect('mongodb+srv://amanasati09:Amanasati123@cluster0.ru1lyx8.mongodb.net/').then(() => console.log('Connected!'));
+const mongoose = require('mongoose');
+
+const MONGODB_URI =
+    process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/paytm-like-app';
+
+async function connectDB() {
+    await mongoose.connect(MONGODB_URI);
+    console.log(`Connected to MongoDB: ${MONGODB_URI}`);
+}
+
 const userSchema = new mongoose.Schema({
     username: {
         type: String,
@@ -40,6 +47,7 @@ const accountSchema = new mongoose.Schema({
         required: true
     }
 });
-const User = mongoose.model('User',userSchema)
-const Account = mongoose.model('Account',accountSchema)
-module.exports = {User,Account}
+const User = mongoose.model('User', userSchema)
+const Account = mongoose.model('Account', accountSchema)
+
+module.exports = { User, Account, connectDB, MONGODB_URI }

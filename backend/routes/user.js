@@ -1,6 +1,7 @@
 const { Router } = require("express");
 const {JWT_SECRET} = require ("../config.js");
-const jwt = require('jsonwebtoken')
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 const {User,Account} = require('../db.js')
 const z = require('zod')
 const {AuthMiddleWare }= require('../middleware.js')
@@ -22,6 +23,7 @@ const signupBody = z.object({
 
 const router = Router()
 router.post('/signup',async(req,res)=>{
+   console.log("Received body:", req.body);
    
    try {
     const signupData  = req.body
@@ -39,11 +41,12 @@ router.post('/signup',async(req,res)=>{
               message: "Email already taken / Incorrect inputs"
           })
       }
+     const hashedPassword = await bcrypt.hash(signupData.password, 10);
      const userData = await User.create({
           username : signupData.username,
           firstName : signupData.firstName,
           lastName : signupData.lastName,
-          password  : signupData.password
+          password  : hashedPassword
       })
       const userId = userData._id
       const AccountData = await Account.create({
@@ -69,46 +72,53 @@ router.post ('/signin',async(req,res)=>{
     const signinData = req.body
     const {success} =  signinBody.safeParse(signinData)
    if(!success){
-      res.status(411).json({
+      return res.status(411).json({
 	      message: "Incorrect inputs"
       })
    }
-    const user = await User.findOne({
-        username : signinData.username,
-        password : signinData.password
-     })
-    if(user){
-        const token = jwt.sign({id : user._id},JWT_SECRET)
-        res.json({
-            token: token
-        })
-        return;
-    }
-    res.status(411).json({
-        message: "Error while logging in"
-    })
-})
-router.put('/',AuthMiddleWare,(req,res)=>{
-    const {success} = updateBody.safeParse(req.body);
-    const updateData = req.body
-    const user = User.findById(updateData.userId)
+    const user = await User.findOne({ username: signinData.username });
     if(!user){
-        res.status(411).json({
-            message : "user-id is not found"
-        })
+        return res.status(411).json({
+            message: "Error while logging in"
+        });
     }
-    User.updatOne({_id : req.userId},req.body)
-    res.status(200).json({
-        message: "Error while updating information"
-    })
-
+    const isPasswordValid = await bcrypt.compare(signinData.password,user.password);
+    if(!isPasswordValid){
+         return res.status(411).json({
+        message: "Error while logging in"
+        });
+    }
+    const token = jwt.sign({id:user._id},JWT_SECRET);
+    return res.status(200).json({
+        message: "Signin successful",
+        token
+    });
 })
+router.put('/',AuthMiddleWare,async(req,res)=>{
+    const {success} = updateBody.safeParse(req.body);
+    if(!success){
+        return res.status(411).json({
+            message:"Incroorect inputs"
+        });
+    }
+    const updateData = { ...req.body};
+    if (updateData.password){
+        updateData.password = await bcrypt.hash(updateData.password,10);
+    }
+    
+    await User.updateOne({_id : req.userId},updateData);
+    res.status(200).json({
+        message: "Updated successfully"
+    });
+
+});
 router.get('/bulk',async(req,res)=>{
    const filter = req.query.filter || ""
    const users =await User.find({
    $or : [{
     firstName :{
-        "$regex" :filter
+        "$regex" :filter,
+        "$options":"i"
     }
    },
     {

@@ -1,8 +1,8 @@
 function Input({lebel , placeholder,type,onChange}){
     return(
         <>
-             <h1 className="text-sm mt-3 font-semibold">{lebel}</h1>
-            <input type={type} onChange={onChange} placeholder={placeholder} className="bg-gray-300 border-black border-2 mt-5  p-1 font-light text-base bg" />
+             <h1 className="mt-4 text-sm font-semibold text-slate-700">{lebel}</h1>
+            <input type={type} onChange={onChange} placeholder={placeholder} className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-base font-normal text-slate-800 outline-none transition focus:border-slate-300 focus:bg-white focus:shadow-sm" />
             </>
     )
 }
