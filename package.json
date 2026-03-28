@@ -1,4 +1,20 @@
 {
+  "name": "paytm-like-app",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Paytm-like app with a React + Vite frontend and an Express backend.",
+  "scripts": {
+    "frontend:dev": "npm --prefix frontend run dev",
+    "frontend:build": "npm --prefix frontend run build",
+    "frontend:preview": "npm --prefix frontend run preview",
+    "backend:start": "npm --prefix backend start"
+  },
+  "keywords": [
+    "react",
+    "vite",
+    "express",
+    "paytm-clone"
+  ],
   "dependencies": {
     "jsonwebtoken": "^9.0.3"
   }
