@@ -7,6 +7,21 @@ const { connectDB } = require('./db');
 
 app.use(cors());
 app.use(express.json());
+
+app.get('/', (req, res) => {
+    res.json({
+        message: 'Backend is running',
+        health: '/api/v1/health'
+    });
+});
+
+app.get('/api/v1/health', (req, res) => {
+    res.json({
+        ok: true,
+        message: 'API is healthy'
+    });
+});
+
 app.use('/api/v1', mainRouter);
 
 async function startServer() {
