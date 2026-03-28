@@ -4,10 +4,7 @@
   "version": "1.0.0",
   "description": "Paytm-like app with a React + Vite frontend and an Express backend.",
   "scripts": {
-<<<<<<< HEAD
-=======
     "build": "npm --prefix frontend run build",
->>>>>>> c78389b (Fix Vercel build for frontend Vite app)
     "frontend:dev": "npm --prefix frontend run dev",
     "frontend:build": "npm --prefix frontend run build",
     "frontend:preview": "npm --prefix frontend run preview",
